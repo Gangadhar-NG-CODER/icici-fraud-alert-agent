@@ -20,9 +20,9 @@ export interface AppConfig {
 }
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
-  companyName: 'Teach-the-Tutor',
-  pageTitle: 'Teach-the-Tutor: Active Recall Coach',
-  pageDescription: 'Master programming concepts through active recall with AI-powered tutors',
+  companyName: 'Zerodha',
+  pageTitle: 'Zerodha SDR Agent - AI Sales Representative',
+  pageDescription: 'Talk to our AI SDR to learn about Zerodha products, pricing, and services',
 
   supportsChatInput: true,
   supportsVideoInput: false,
@@ -30,10 +30,10 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   isPreConnectBufferEnabled: true,
 
   logo: '/lk-logo.svg',
-  accent: '#6366f1',
+  accent: '#06b6d4',
   logoDark: '/lk-logo-dark.svg',
-  accentDark: '#818cf8',
-  startButtonText: 'Start Learning',
+  accentDark: '#22d3ee',
+  startButtonText: 'Talk to SDR',
 
   // for LiveKit Cloud Sandbox
   sandboxId: undefined,

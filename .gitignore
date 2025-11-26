@@ -99,3 +99,9 @@ pnpm-lock.yaml
 *.mp3
 *.mp4
 recordings/
+
+# ===================================
+# User Data / Leads
+# ===================================
+backend/leads/
+leads/

@@ -1,0 +1,72 @@
+{
+  "company_name": "Zerodha",
+  "tagline": "India's largest stock broker",
+  "founded": "2010",
+  "headquarters": "Bangalore, India",
+  "founders": ["Nithin Kamath", "Nikhil Kamath"],
+  
+  "overview": "Zerodha is India's largest retail stockbroker, offering discount brokerage services with zero commission on equity delivery trades. We provide trading platforms, investment tools, and educational resources for retail and institutional investors.",
+  
+  "products": [
+    {
+      "name": "Kite",
+      "description": "Fast and elegant trading platform for web and mobile. Trade stocks, F&O, commodities, and currencies with advanced charting and order types.",
+      "target_audience": "Active traders and investors"
+    },
+    {
+      "name": "Coin",
+      "description": "Direct mutual fund investment platform with zero commission. Invest in 3000+ mutual funds directly without any distributor markup.",
+      "target_audience": "Long-term investors"
+    },
+    {
+      "name": "Console",
+      "description": "Comprehensive back-office for managing your trading account, viewing reports, P&L statements, and tax documents.",
+      "target_audience": "All Zerodha users"
+    },
+    {
+      "name": "Kite Connect",
+      "description": "Trading APIs for developers and algo traders. Build trading apps, integrate with your systems, or run algorithmic strategies.",
+      "target_audience": "Developers, algo traders, fintech companies"
+    },
+    {
+      "name": "Varsity",
+      "description": "Free educational resource with comprehensive modules on trading, investing, and financial markets.",
+      "target_audience": "Beginners and learners"
+    }
+  ],
+  
+  "pricing": {
+    "account_opening": "Free (₹200 for offline accounts)",
+    "account_maintenance": "₹300/year (waived if turnover > ₹1 lakh)",
+    "equity_delivery": "Zero brokerage",
+    "equity_intraday": "₹20 or 0.03% per executed order (whichever is lower)",
+    "equity_futures": "₹20 or 0.03% per executed order (whichever is lower)",
+    "equity_options": "₹20 per executed order",
+    "currency_futures": "₹20 or 0.03% per executed order (whichever is lower)",
+    "currency_options": "₹20 per executed order",
+    "commodity_futures": "₹20 or 0.03% per executed order (whichever is lower)",
+    "commodity_options": "₹20 per executed order",
+    "mutual_funds": "Zero commission (direct plans)",
+    "kite_connect_api": "₹2000/month (unlimited API calls)"
+  },
+  
+  "key_features": [
+    "Zero brokerage on equity delivery trades",
+    "Flat ₹20 per order for intraday and F&O",
+    "No hidden charges or gimmicks",
+    "Advanced trading platforms (Kite web, mobile, desktop)",
+    "Direct mutual fund investments",
+    "Free educational content (Varsity)",
+    "Trading APIs for developers",
+    "24/7 customer support"
+  ],
+  
+  "target_customers": [
+    "Retail traders (intraday, swing, positional)",
+    "Long-term investors",
+    "Mutual fund investors",
+    "Algo traders and quant firms",
+    "Fintech companies building trading apps",
+    "Educational institutions"
+  ]
+}
