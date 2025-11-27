@@ -1,0 +1,76 @@
+{
+  "cases": [
+    {
+      "userName": "John",
+      "securityIdentifier": "12345",
+      "securityQuestion": "What is your mother's maiden name?",
+      "securityAnswer": "Smith",
+      "cardEnding": "4242",
+      "case": "confirmed_safe",
+      "transactionAmount": "$1,247.99",
+      "transactionName": "ABC Industry",
+      "transactionTime": "November 26, 2025 at 11:45 PM",
+      "transactionCategory": "e-commerce",
+      "transactionSource": "alibaba.com",
+      "transactionLocation": "Shanghai, China",
+      "verification_status": "verified",
+      "outcome_note": "Customer John confirmed the transaction as legitimate on 2025-11-27 15:40:35"
+    },
+    {
+      "userName": "Sarah",
+      "securityIdentifier": "67890",
+      "securityQuestion": "What city were you born in?",
+      "securityAnswer": "Boston",
+      "cardEnding": "8765",
+      "case": "pending_review",
+      "transactionAmount": "$3,499.00",
+      "transactionName": "Luxury Electronics Ltd",
+      "transactionTime": "November 27, 2025 at 2:30 AM",
+      "transactionCategory": "electronics",
+      "transactionSource": "techdeals-overseas.com",
+      "transactionLocation": "Hong Kong"
+    },
+    {
+      "userName": "Michael",
+      "securityIdentifier": "24680",
+      "securityQuestion": "What was your first pet's name?",
+      "securityAnswer": "Buddy",
+      "cardEnding": "1357",
+      "case": "pending_review",
+      "transactionAmount": "$899.50",
+      "transactionName": "Global Fashion Store",
+      "transactionTime": "November 26, 2025 at 9:15 PM",
+      "transactionCategory": "retail",
+      "transactionSource": "fashionworld.ru",
+      "transactionLocation": "Moscow, Russia"
+    },
+    {
+      "userName": "Emily",
+      "securityIdentifier": "13579",
+      "securityQuestion": "What is your favorite color?",
+      "securityAnswer": "Blue",
+      "cardEnding": "9876",
+      "case": "pending_review",
+      "transactionAmount": "$2,150.00",
+      "transactionName": "Premium Gaming Store",
+      "transactionTime": "November 27, 2025 at 1:00 AM",
+      "transactionCategory": "gaming",
+      "transactionSource": "gamingparadise.net",
+      "transactionLocation": "Singapore"
+    },
+    {
+      "userName": "David",
+      "securityIdentifier": "98765",
+      "securityQuestion": "What street did you grow up on?",
+      "securityAnswer": "Oak Street",
+      "cardEnding": "5432",
+      "case": "pending_review",
+      "transactionAmount": "$567.25",
+      "transactionName": "International Marketplace",
+      "transactionTime": "November 26, 2025 at 10:30 PM",
+      "transactionCategory": "marketplace",
+      "transactionSource": "worldmarket.com",
+      "transactionLocation": "London, UK"
+    }
+  ]
+}

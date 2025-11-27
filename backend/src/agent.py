@@ -2,7 +2,7 @@ import logging
 import json
 from pathlib import Path
 from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -27,381 +27,300 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
-# Load company info and FAQ
-company_info_path = Path(__file__).parent.parent / "shared-data" / "zerodha_company_info.json"
-faq_path = Path(__file__).parent.parent / "shared-data" / "zerodha_faq.json"
+# Load fraud cases database
+fraud_cases_path = Path(__file__).parent.parent / "fraud-data" / "fraud_cases.json"
 
-with open(company_info_path, "r") as f:
-    COMPANY_INFO = json.load(f)
+with open(fraud_cases_path, "r") as f:
+    FRAUD_DATABASE = json.load(f)
 
-with open(faq_path, "r") as f:
-    FAQ_DATA = json.load(f)["faqs"]
-
-# Create leads directory if it doesn't exist
-leads_dir = Path(__file__).parent.parent / "leads"
-leads_dir.mkdir(exist_ok=True)
+# Create fraud-data directory if it doesn't exist
+fraud_data_dir = Path(__file__).parent.parent / "fraud-data"
+fraud_data_dir.mkdir(exist_ok=True)
 
 
 @dataclass
-class LeadInfo:
-    """Store lead information collected during conversation"""
-    name: Optional[str] = None
-    company: Optional[str] = None
-    email: Optional[str] = None
-    role: Optional[str] = None
-    use_case: Optional[str] = None
-    team_size: Optional[str] = None
-    timeline: Optional[str] = None  # now / soon / later
+class FraudCase:
+    """Store fraud case information"""
+    userName: str
+    securityIdentifier: str
+    securityQuestion: str
+    securityAnswer: str
+    cardEnding: str
+    case: str
+    transactionAmount: str
+    transactionName: str
+    transactionTime: str
+    transactionCategory: str
+    transactionSource: str
+    transactionLocation: str
+    verification_status: Optional[str] = None
+    outcome_note: Optional[str] = None
     
     def to_dict(self):
         return {
-            "name": self.name,
-            "company": self.company,
-            "email": self.email,
-            "role": self.role,
-            "use_case": self.use_case,
-            "team_size": self.team_size,
-            "timeline": self.timeline
+            "userName": self.userName,
+            "securityIdentifier": self.securityIdentifier,
+            "securityQuestion": self.securityQuestion,
+            "securityAnswer": self.securityAnswer,
+            "cardEnding": self.cardEnding,
+            "case": self.case,
+            "transactionAmount": self.transactionAmount,
+            "transactionName": self.transactionName,
+            "transactionTime": self.transactionTime,
+            "transactionCategory": self.transactionCategory,
+            "transactionSource": self.transactionSource,
+            "transactionLocation": self.transactionLocation,
+            "verification_status": self.verification_status,
+            "outcome_note": self.outcome_note
         }
-    
-    def is_complete(self):
-        """Check if all essential fields are collected"""
-        return all([
-            self.name,
-            self.email,
-            self.use_case
-        ])
-    
-    def get_missing_fields(self):
-        """Return list of missing essential fields"""
-        missing = []
-        if not self.name:
-            missing.append("name")
-        if not self.email:
-            missing.append("email")
-        if not self.use_case:
-            missing.append("use case")
-        return missing
 
 
 @dataclass
 class Userdata:
     agent_session: Optional[AgentSession] = None
-    lead_info: LeadInfo = field(default_factory=LeadInfo)
+    fraud_case: Optional[FraudCase] = None
     conversation_started: bool = False
+    verification_passed: bool = False
 
 
 def prewarm(proc: JobProcess):
     """Prewarm function to load models before agent starts"""
     proc.userdata["vad"] = silero.VAD.load()
-    logger.info("Prewarmed VAD model and loaded FAQ data")
+    logger.info("Prewarmed VAD model and loaded fraud cases database")
 
 
-def search_faq(query: str, top_k: int = 3) -> list:
-    """Simple keyword-based FAQ search"""
-    query_lower = query.lower()
-    scored_faqs = []
-    
-    for faq in FAQ_DATA:
-        score = 0
-        # Check keywords
-        for keyword in faq["keywords"]:
-            if keyword in query_lower:
-                score += 2
-        
-        # Check question
-        question_words = faq["question"].lower().split()
-        for word in query_lower.split():
-            if len(word) > 3 and word in question_words:
-                score += 1
-        
-        # Check answer
-        answer_words = faq["answer"].lower().split()
-        for word in query_lower.split():
-            if len(word) > 3 and word in answer_words:
-                score += 0.5
-        
-        if score > 0:
-            scored_faqs.append((score, faq))
-    
-    # Sort by score and return top_k
-    scored_faqs.sort(reverse=True, key=lambda x: x[0])
-    return [faq for score, faq in scored_faqs[:top_k]]
+def load_fraud_case(username: str) -> Optional[dict]:
+    """Load fraud case from database by username"""
+    for case in FRAUD_DATABASE["cases"]:
+        if case["userName"].lower() == username.lower():
+            return case
+    return None
 
 
-class ZerodhaSdrAgent(Agent):
+def save_fraud_database():
+    """Save updated fraud database back to JSON file"""
+    with open(fraud_cases_path, "w") as f:
+        json.dump(FRAUD_DATABASE, f, indent=2)
+    logger.info("Saved updated fraud database")
+
+
+class FraudAlertAgent(Agent):
     def __init__(self) -> None:
-        # Create company overview for context
-        products_list = "\n".join([
-            f"- {p['name']}: {p['description']}"
-            for p in COMPANY_INFO["products"]
-        ])
-        
-        pricing_summary = f"""
-Pricing:
-- Account Opening: {COMPANY_INFO['pricing']['account_opening']}
-- Annual Maintenance: {COMPANY_INFO['pricing']['account_maintenance']}
-- Equity Delivery: {COMPANY_INFO['pricing']['equity_delivery']}
-- Intraday/F&O: {COMPANY_INFO['pricing']['equity_intraday']}
-- Mutual Funds: {COMPANY_INFO['pricing']['mutual_funds']}
-- Kite Connect API: {COMPANY_INFO['pricing']['kite_connect_api']}
-"""
-        
         super().__init__(
-            instructions=f"""You are a friendly and professional Sales Development Representative (SDR) for Zerodha, India's largest stock broker.
+            instructions="""You are a professional Fraud Detection Representative for ICICI Bank, calling customers about suspicious transactions on their accounts.
 
-**ABOUT ZERODHA:**
-{COMPANY_INFO['overview']}
+**YOUR ROLE:**
 
-**OUR PRODUCTS:**
-{products_list}
+You are contacting customers about potentially fraudulent transactions. Your job is to:
+1. Introduce yourself professionally
+2. Ask for the customer's name to load their case
+3. Verify their identity using a security question
+4. Inform them about the suspicious transaction
+5. Ask if they authorized it
+6. Take appropriate action based on their response
 
-{pricing_summary}
+**CONVERSATION FLOW:**
 
-**YOUR ROLE AS AN SDR:**
+**STEP 1 - INTRODUCTION:**
+- Greet professionally: "Hello, this is the ICICI Bank Fraud Detection Department."
+- Explain purpose: "We're calling about a suspicious transaction on your account."
+- Ask for their name: "May I have your name please?"
+- Use load_fraud_case tool with their name
 
-1. **WARM GREETING:**
-   - Greet the visitor warmly and professionally
-   - Simply say you're an SDR at Zerodha (don't use placeholder names)
-   - Ask what brought them here today and what they're working on
+**STEP 2 - VERIFICATION:**
+- Once case is loaded, say: "For security purposes, I need to verify your identity."
+- Ask the security question from the loaded case
+- Use verify_customer tool with their answer
+- If verification fails: Politely end the call saying you cannot proceed without verification
+- If verification passes: Continue to transaction details
 
-2. **UNDERSTAND THEIR NEEDS:**
-   - Listen carefully to understand their trading/investing needs
-   - Ask clarifying questions about their use case
-   - Keep the conversation focused and natural
+**STEP 3 - TRANSACTION DETAILS:**
+- Read out the suspicious transaction clearly:
+  * "We detected a transaction on your card ending in [cardEnding]"
+  * "Amount: [transactionAmount]"
+  * "Merchant: [transactionName]"
+  * "Location: [transactionLocation]"
+  * "Time: [transactionTime]"
+  * "Source: [transactionSource]"
 
-3. **ANSWER QUESTIONS USING FAQ:**
-   - When they ask about products, pricing, or features, use the search_faq tool
-   - Answer based ONLY on the FAQ content - never make up information
-   - If you don't find relevant information in FAQ, be honest and offer to connect them with the team
+**STEP 4 - CONFIRMATION:**
+- Ask directly: "Did you authorize this transaction?"
+- Listen for clear yes or no
+- Use mark_transaction tool with their response:
+  * If they say YES → mark as "safe"
+  * If they say NO → mark as "fraudulent"
 
-4. **COLLECT LEAD INFORMATION (VERY IMPORTANT):**
-   - After answering their questions, ALWAYS ask for their contact information
-   - You MUST collect these essential fields:
-     * Name - Ask: "By the way, what's your name?"
-     * Email - Ask: "What's the best email to reach you at?"
-     * Use case - Ask: "What specifically are you looking to use Zerodha for?"
-   - Also try to collect (if relevant):
-     * Company - Ask: "Which company are you with?"
-     * Role - Ask: "What's your role there?"
-     * Team size - Ask: "How big is your team?"
-     * Timeline - Ask: "When are you looking to get started?"
-   - Use the save_lead_field tool IMMEDIATELY after they provide each piece of information
-   - Be friendly and conversational, not like filling a form
-   - Example: "That's great! By the way, what's your name?" then use save_lead_field("name", "their answer")
-
-5. **DETECT CONVERSATION END:**
-   - Listen for signals that the user is done: "that's all", "thanks", "goodbye", "I'm done", etc.
-   - When you detect they're wrapping up, use the end_call_summary tool
-   - This will generate a summary and save the lead information
-
-**CONVERSATION STYLE:**
-- Be warm, friendly, and professional
-- Speak naturally - you're having a conversation, not reading a script
-- Show genuine interest in helping them
-- Be concise but informative
-- If they seem interested, gently guide them toward next steps (account opening, demo, etc.)
+**STEP 5 - RESOLUTION:**
+- If marked safe: "Thank you for confirming. We've marked this transaction as legitimate. Your card remains active."
+- If marked fraudulent: "I understand. We've immediately blocked your card ending in [cardEnding] and will issue a replacement. A dispute has been filed and you will not be charged for this transaction."
+- End professionally: "Is there anything else I can help you with regarding this matter?"
+- When they're done, use end_fraud_call tool
 
 **IMPORTANT RULES:**
-- NEVER make up information not in the FAQ
-- ALWAYS use search_faq tool when answering product/pricing questions
-- ALWAYS ask for at least name, email, and use case - this is mandatory
-- Use save_lead_field tool IMMEDIATELY after they provide each piece of information
-- When conversation ends, use end_call_summary tool
+- NEVER ask for full card numbers, PINs, or passwords
+- Be calm, professional, and reassuring
+- Speak clearly when reading transaction details
+- Wait for clear confirmation before marking the case
+- Always use the tools in the correct order
+- Keep the conversation focused on the fraud case
 
-**MANDATORY CONVERSATION FLOW:**
-1. Greet and ask what brought them here
-2. Answer their FAQ questions using search_faq tool
-3. After answering 2-3 questions, YOU MUST ask for ALL these fields IN ORDER:
-   - "By the way, what's your name?" → use save_lead_field("name", answer)
-   - "What's the best email to reach you at?" → use save_lead_field("email", answer)
-   - "Which company are you with?" → use save_lead_field("company", answer)
-   - "What's your role there?" → use save_lead_field("role", answer)
-   - "What specifically are you looking to use Zerodha for?" → use save_lead_field("use_case", answer)
-   - "How big is your team?" → use save_lead_field("team_size", answer)
-   - "When are you looking to get started?" → use save_lead_field("timeline", answer)
-4. After collecting ALL 7 fields, wait for them to say "that's all" or "thanks"
-5. Then use end_call_summary tool
+**SECURITY:**
+- Only verify using the security question from the database
+- Never ask for sensitive information
+- If customer seems confused or uncertain, offer to call back
 
-CRITICAL: You MUST ask for ALL 7 fields - name, email, company, role, use_case, team_size, timeline. Do NOT skip any!"""
+**TONE:**
+- Professional but warm
+- Calm and reassuring
+- Clear and direct
+- Patient and understanding"""
         )
 
     @function_tool
-    async def search_faq(
+    async def load_fraud_case(
         self,
         context: RunContext[Userdata],
-        query: str
+        username: str
     ) -> str:
-        """Search the FAQ database for relevant answers to user questions.
+        """Load a fraud case from the database using the customer's name.
         
-        Use this tool whenever the user asks about:
-        - What Zerodha does
-        - Products (Kite, Coin, Console, Kite Connect, Varsity)
-        - Pricing and charges
-        - Account opening process
-        - Trading capabilities
-        - Technical requirements
-        - Any other product or service questions
+        Use this tool immediately after the customer provides their name.
+        This will load their fraud case details into memory.
         
         Args:
-            query: The user's question or topic they're asking about
+            username: The customer's name as they provided it
         """
-        logger.info(f"Searching FAQ for: {query}")
+        logger.info(f"Loading fraud case for: {username}")
         
-        results = search_faq(query, top_k=2)
+        case_data = load_fraud_case(username)
         
-        if not results:
-            return "I don't have specific information about that in my knowledge base. Let me connect you with our team who can provide detailed information. Could you share your email so we can follow up?"
+        if not case_data:
+            logger.warning(f"No fraud case found for username: {username}")
+            return f"I apologize, but I don't see any fraud alert for the name {username}. Could you please verify the name on the account?"
         
-        # Format the answer
-        answer_parts = []
-        for faq in results:
-            answer_parts.append(faq["answer"])
+        # Create FraudCase object and store in context
+        fraud_case = FraudCase(**case_data)
+        context.userdata.fraud_case = fraud_case
         
-        combined_answer = " ".join(answer_parts)
-        logger.info(f"Found {len(results)} relevant FAQ entries")
+        logger.info(f"Loaded fraud case for {username}: Card ending {fraud_case.cardEnding}")
         
-        return combined_answer
+        return f"Thank you, {username}. I have your account information here. For security purposes, I need to verify your identity before we proceed. {fraud_case.securityQuestion}"
 
     @function_tool
-    async def save_lead_field(
+    async def verify_customer(
         self,
         context: RunContext[Userdata],
-        field_name: str,
-        field_value: str
+        answer: str
     ) -> str:
-        """Save a piece of lead information that you've collected during the conversation.
+        """Verify the customer's identity using their answer to the security question.
         
-        Use this tool to store lead details as you learn them naturally during conversation.
+        Use this tool after asking the security question from the loaded fraud case.
+        This will check if their answer matches the expected answer.
         
         Args:
-            field_name: The type of information (must be one of: name, company, email, role, use_case, team_size, timeline)
-            field_value: The actual value/information provided by the user
+            answer: The customer's answer to the security question
         """
-        lead_info = context.userdata.lead_info
+        fraud_case = context.userdata.fraud_case
         
-        field_name = field_name.lower().strip()
+        if not fraud_case:
+            return "I apologize, but I need to load your case first. Could you please provide your name?"
         
-        # Map field names to LeadInfo attributes
-        if field_name in ["name", "full name", "your name"]:
-            lead_info.name = field_value
-            logger.info(f"Saved lead name: {field_value}")
-            return f"Got it, {field_value}!"
+        logger.info(f"Verifying customer answer for {fraud_case.userName}")
+        
+        # Simple case-insensitive comparison
+        if answer.lower().strip() == fraud_case.securityAnswer.lower().strip():
+            context.userdata.verification_passed = True
+            logger.info(f"Verification PASSED for {fraud_case.userName}")
+            return "Thank you for verifying your identity. Now, let me tell you about the suspicious transaction we detected."
+        else:
+            context.userdata.verification_passed = False
+            logger.warning(f"Verification FAILED for {fraud_case.userName}")
+            return "I'm sorry, but that answer doesn't match our records. For your security, I cannot proceed without proper verification. Please contact ICICI Bank directly at 1-800-ICICI-BANK. Goodbye."
+
+    @function_tool
+    async def mark_transaction(
+        self,
+        context: RunContext[Userdata],
+        status: str
+    ) -> str:
+        """Mark the transaction as safe or fraudulent based on customer confirmation.
+        
+        Use this tool after the customer clearly confirms whether they made the transaction.
+        
+        Args:
+            status: Either "safe" (customer confirmed they made it) or "fraudulent" (customer denies making it)
+        """
+        fraud_case = context.userdata.fraud_case
+        
+        if not fraud_case:
+            return "I apologize, but I don't have a case loaded. Please provide your name first."
+        
+        if not context.userdata.verification_passed:
+            return "I cannot update the case without proper verification."
+        
+        status = status.lower().strip()
+        
+        if status == "safe":
+            fraud_case.case = "confirmed_safe"
+            fraud_case.verification_status = "verified"
+            fraud_case.outcome_note = f"Customer {fraud_case.userName} confirmed the transaction as legitimate on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             
-        elif field_name in ["company", "organization", "firm"]:
-            lead_info.company = field_value
-            logger.info(f"Saved lead company: {field_value}")
-            return f"Great, {field_value}."
+            # Update database
+            for case in FRAUD_DATABASE["cases"]:
+                if case["userName"] == fraud_case.userName:
+                    case["case"] = fraud_case.case
+                    case["verification_status"] = fraud_case.verification_status
+                    case["outcome_note"] = fraud_case.outcome_note
+                    break
             
-        elif field_name in ["email", "email address", "email id"]:
-            lead_info.email = field_value
-            logger.info(f"Saved lead email: {field_value}")
-            return f"Perfect, I've noted down {field_value}."
+            save_fraud_database()
+            logger.info(f"Marked transaction as SAFE for {fraud_case.userName}")
             
-        elif field_name in ["role", "designation", "position", "job title"]:
-            lead_info.role = field_value
-            logger.info(f"Saved lead role: {field_value}")
-            return f"Understood, you're a {field_value}."
+            return f"Thank you for confirming. I've marked this transaction as legitimate in our system. Your card ending in {fraud_case.cardEnding} remains active and no further action is needed."
             
-        elif field_name in ["use_case", "use case", "purpose", "need", "requirement"]:
-            lead_info.use_case = field_value
-            logger.info(f"Saved lead use case: {field_value}")
-            return "That's helpful context, thank you."
+        elif status == "fraudulent":
+            fraud_case.case = "confirmed_fraud"
+            fraud_case.verification_status = "verified"
+            fraud_case.outcome_note = f"Customer {fraud_case.userName} denied the transaction. Card blocked and dispute filed on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             
-        elif field_name in ["team_size", "team size", "team", "size"]:
-            lead_info.team_size = field_value
-            logger.info(f"Saved lead team size: {field_value}")
-            return "Got it."
+            # Update database
+            for case in FRAUD_DATABASE["cases"]:
+                if case["userName"] == fraud_case.userName:
+                    case["case"] = fraud_case.case
+                    case["verification_status"] = fraud_case.verification_status
+                    case["outcome_note"] = fraud_case.outcome_note
+                    break
             
-        elif field_name in ["timeline", "when", "timeframe", "urgency"]:
-            # Normalize timeline to now/soon/later
-            value_lower = field_value.lower()
-            if any(word in value_lower for word in ["now", "immediate", "asap", "today", "this week"]):
-                lead_info.timeline = "now"
-            elif any(word in value_lower for word in ["soon", "next week", "next month", "couple weeks"]):
-                lead_info.timeline = "soon"
-            else:
-                lead_info.timeline = "later"
-            logger.info(f"Saved lead timeline: {lead_info.timeline}")
-            return "Understood."
+            save_fraud_database()
+            logger.info(f"Marked transaction as FRAUDULENT for {fraud_case.userName}")
+            
+            return f"I understand. I've immediately blocked your card ending in {fraud_case.cardEnding}. A replacement card will be mailed to you within 5-7 business days. We've also filed a dispute for the {fraud_case.transactionAmount} charge, and you will not be held responsible for this fraudulent transaction."
         
         else:
-            return f"I've noted that information."
+            return "I need a clear confirmation. Did you make this transaction - yes or no?"
 
     @function_tool
-    async def end_call_summary(
+    async def end_fraud_call(
         self,
         context: RunContext[Userdata]
     ) -> str:
-        """Generate end-of-call summary and save lead information.
+        """End the fraud alert call with a professional closing.
         
-        Use this tool when you detect the conversation is ending, such as when the user says:
-        - "That's all"
-        - "Thanks"
-        - "Goodbye"
-        - "I'm done"
-        - "That's it"
-        - Or any other closing statement
+        Use this tool when the customer indicates they're done or have no more questions.
         """
-        lead_info = context.userdata.lead_info
+        fraud_case = context.userdata.fraud_case
         
-        # Generate timestamp for filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        lead_filename = leads_dir / f"lead_{timestamp}.json"
-        
-        # Prepare lead data
-        lead_data = {
-            "timestamp": datetime.now().isoformat(),
-            "lead_info": lead_info.to_dict(),
-            "status": "complete" if lead_info.is_complete() else "partial"
-        }
-        
-        # Save to JSON file
-        with open(lead_filename, "w") as f:
-            json.dump(lead_data, f, indent=2)
-        
-        logger.info(f"Saved lead to {lead_filename}")
-        
-        # Generate verbal summary
-        summary_parts = []
-        
-        if lead_info.name:
-            summary_parts.append(f"I've been speaking with {lead_info.name}")
-        
-        if lead_info.role and lead_info.company:
-            summary_parts.append(f"who is a {lead_info.role} at {lead_info.company}")
-        elif lead_info.role:
-            summary_parts.append(f"who is a {lead_info.role}")
-        elif lead_info.company:
-            summary_parts.append(f"from {lead_info.company}")
-        
-        if lead_info.use_case:
-            summary_parts.append(f"They're interested in {lead_info.use_case}")
-        
-        if lead_info.timeline:
-            if lead_info.timeline == "now":
-                summary_parts.append("and they're looking to get started right away")
-            elif lead_info.timeline == "soon":
-                summary_parts.append("and they're planning to start soon")
+        if fraud_case:
+            logger.info(f"Ending fraud call for {fraud_case.userName}. Final status: {fraud_case.case}")
+            
+            if fraud_case.case == "confirmed_safe":
+                return "You're all set. Thank you for your time, and have a great day. Goodbye."
+            elif fraud_case.case == "confirmed_fraud":
+                return "We've taken care of everything. You're protected. If you have any questions, please call our fraud department at 1-800-SECURE-BANK. Have a great day. Goodbye."
             else:
-                summary_parts.append("and they're in the exploration phase")
-        
-        if summary_parts:
-            verbal_summary = ". ".join(summary_parts) + "."
+                return "Thank you for your time. If you have any concerns, please contact us at 1-800-ICICI-BANK. Goodbye."
         else:
-            verbal_summary = "Thank you for your interest in Zerodha."
-        
-        # Add closing message
-        closing = " Our team will reach out to you shortly"
-        if lead_info.email:
-            closing += f" at {lead_info.email}"
-        closing += ". Have a great day!"
-        
-        full_summary = verbal_summary + closing
-        
-        logger.info(f"Generated summary: {full_summary}")
-        
-        return full_summary
+            return "Thank you for calling ICICI Bank. Goodbye."
 
 
 async def entrypoint(ctx: JobContext):
@@ -448,7 +367,7 @@ async def entrypoint(ctx: JobContext):
 
     # Start session
     await session.start(
-        agent=ZerodhaSdrAgent(),
+        agent=FraudAlertAgent(),
         room=ctx.room,
         room_input_options=RoomInputOptions(
             noise_cancellation=noise_cancellation.BVC(),

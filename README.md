@@ -1,85 +1,86 @@
-# 🎙️ Zerodha SDR Voice Agent
+# ICICI Bank Fraud Alert Voice Agent
 
-An AI-powered Sales Development Representative (SDR) voice agent for Zerodha that answers FAQ questions and captures lead information through natural conversation. Built to demonstrate intelligent lead qualification and data collection in voice interactions.
+🎙️ **AI Voice Agents Challenge by murf.ai - Day 6**
 
-**Built for the Murf AI Voice Agents Challenge - Day 5**
+Welcome to the ICICI Bank Fraud Alert Voice Agent! This project is part of the AI Voice Agents Challenge, where we build 10 AI Voice Agents over 10 days using **Murf Falcon** – the consistently fastest TTS API.
 
-[![GitHub](https://img.shields.io/badge/GitHub-zerodha--sdr--voice--agent-blue?logo=github)](https://github.com/Gangadhar-NG-CODER/zerodha-sdr-voice-agent)
+## About the Challenge
 
----
+We just launched Murf Falcon – the consistently fastest TTS API, and you're going to be among the first to test it out in ways never thought before!
 
-## ✨ Features
+Build 10 AI Voice Agents over the course of 10 Days along with help from our devs and the community champs, and win rewards!
 
-### Primary Goal - Simple FAQ SDR + Lead Capture
+## About This Project
 
-✅ **Company**: Zerodha (India's largest stock broker)
+This is Day 6 of the 10-day AI Voice Agents Challenge. The task was to build a fraud alert voice agent that:
+- Loads fraud cases from a database
+- Verifies customer identity with security questions
+- Reads suspicious transaction details
+- Confirms or denies fraud based on customer response
+- Updates the database with case outcomes
 
-✅ **SDR Persona**: 
-- Warm and professional greeting
-- Natural conversation flow
-- Focused on understanding user needs
-- Intelligent lead qualification
+An AI-powered fraud detection voice agent for ICICI Bank that verifies suspicious transactions through natural conversation and updates a fraud case database in real-time.
 
-✅ **FAQ System**: 
-- 25 comprehensive FAQs covering all aspects of Zerodha
-- Keyword-based search for accurate answers
-- Products: Kite, Coin, Console, Kite Connect, Varsity
-- Pricing, account opening, trading capabilities
-- No hallucination - answers only from FAQ database
+## Repository Structure
 
-✅ **Lead Capture**:
-Naturally collects during conversation:
-- Name
-- Company
-- Email
-- Role/Designation
-- Use case (what they need Zerodha for)
-- Team size
-- Timeline (now/soon/later)
+This is a monorepo that contains both the backend and frontend for the ICICI Bank Fraud Alert Voice Agent.
 
-✅ **End-of-Call Summary**:
-- Verbal summary of the lead
-- JSON file with complete lead data
-- Stored in `backend/leads/` directory
-- Timestamp-based file naming
+```
+icici-fraud-alert-agent/
+├── backend/          # LiveKit Agents backend with Murf Falcon TTS
+├── frontend/         # React/Next.js frontend for voice interaction
+└── README.md         # This file
+```
 
----
+## Backend
 
-## 🛠️ Tech Stack
+The backend is based on LiveKit's agent-starter-python with modifications to integrate Murf Falcon TTS for ultra-fast, high-quality voice synthesis in fraud detection scenarios.
 
-- **TTS**: Murf Falcon (fastest text-to-speech API)
-- **STT**: AssemblyAI (high-accuracy speech recognition)
-- **LLM**: Google Gemini 2.5 Flash
-- **Framework**: LiveKit Agents
-- **Frontend**: Next.js 15 + React 19
-- **Backend**: Python 3.12
-- **Styling**: Tailwind CSS
+**Features:**
+- Complete voice AI agent framework using LiveKit Agents
+- Murf Falcon TTS integration for fastest text-to-speech
+- AssemblyAI STT for high-accuracy speech recognition
+- Google Gemini 2.5 Flash for LLM
+- JSON-based fraud case database
+- Real-time database updates
+- Security question verification
+- Professional fraud detection persona
 
----
+→ [Backend Documentation](backend/README.md)
 
-## 🚀 Quick Start
+## Frontend
+
+The frontend is based on LiveKit's agent-starter-react, providing a modern, beautiful UI for interacting with the ICICI Bank Fraud Alert Agent.
+
+**Features:**
+- Real-time voice interaction with LiveKit Agents
+- ICICI Bank branded UI with security-focused design
+- Audio visualization and level monitoring
+- Light/dark theme switching
+- Fraud alert badge and trust indicators
+- Enhanced animations and visual effects
+- Responsive design for desktop and mobile
+
+→ [Frontend Documentation](frontend/README.md)
+
+## Quick Start
 
 ### Prerequisites
 
+Make sure you have the following installed:
 - Python 3.9+ with [uv](https://docs.astral.sh/uv/) package manager
 - Node.js 18+ with pnpm
-- [LiveKit Server](https://github.com/livekit/livekit/releases)
+- LiveKit CLI (optional but recommended)
+- [LiveKit Server](https://github.com/livekit/livekit/releases) for local development
 
-### 1. Clone Repository
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Gangadhar-NG-CODER/zerodha-sdr-voice-agent.git
-cd zerodha-sdr-voice-agent
+git clone https://github.com/Gangadhar-NG-CODER/icici-fraud-alert-agent.git
+cd icici-fraud-alert-agent
 ```
 
-### 2. Get API Keys
-
-You'll need free API keys from:
-- **Murf Falcon**: https://murf.ai/api
-- **Google Gemini**: https://ai.google.dev/
-- **AssemblyAI**: https://www.assemblyai.com/
-
-### 3. Backend Setup
+### 2. Backend Setup
 
 ```bash
 cd backend
@@ -87,22 +88,29 @@ cd backend
 # Install dependencies
 uv sync
 
-# Copy and configure environment
+# Copy environment file and configure
 cp .env.example .env.local
 
-# Edit .env.local with your API keys:
-# LIVEKIT_URL=ws://127.0.0.1:7880
-# LIVEKIT_API_KEY=devkey
-# LIVEKIT_API_SECRET=secret
-# MURF_API_KEY=your_murf_api_key
-# GOOGLE_API_KEY=your_google_api_key
-# ASSEMBLYAI_API_KEY=your_assemblyai_api_key
+# Edit .env.local with your credentials:
+# - LIVEKIT_URL
+# - LIVEKIT_API_KEY
+# - LIVEKIT_API_SECRET
+# - MURF_API_KEY (for Falcon TTS)
+# - GOOGLE_API_KEY (for Gemini LLM)
+# - ASSEMBLYAI_API_KEY (for AssemblyAI STT)
 
 # Download required models
 uv run python src/agent.py download-files
 ```
 
-### 4. Frontend Setup
+For LiveKit Cloud users, you can automatically populate credentials:
+
+```bash
+lk cloud auth
+lk app env -w -d .env.local
+```
+
+### 3. Frontend Setup
 
 ```bash
 cd frontend
@@ -110,226 +118,193 @@ cd frontend
 # Install dependencies
 pnpm install
 
-# Copy and configure environment
+# Copy environment file and configure
 cp .env.example .env.local
 
-# Edit .env.local:
-# LIVEKIT_API_KEY=devkey
-# LIVEKIT_API_SECRET=secret
-# LIVEKIT_URL=ws://127.0.0.1:7880
+# Edit .env.local with the same LiveKit credentials
 ```
 
-### 5. Run the Application
+### 4. Run the Application
 
-**Terminal 1 - LiveKit Server:**
+**Install LiveKit Server:**
+
 ```bash
-# Download from: https://github.com/livekit/livekit/releases
+brew install livekit
+```
+
+You have two options:
+
+**Option A: Run services individually**
+
+```bash
+# Terminal 1 - LiveKit Server
 livekit-server --dev
-```
 
-**Terminal 2 - Backend:**
-```bash
+# Terminal 2 - Backend Agent
 cd backend
 uv run python src/agent.py dev
-```
 
-**Terminal 3 - Frontend:**
-```bash
+# Terminal 3 - Frontend
 cd frontend
 pnpm dev
 ```
 
-Open **http://localhost:3000** in your browser! 🎉
+Then open **http://localhost:3000** in your browser!
 
----
+## How to Use
 
-## 💡 How to Use
+### Test Scenarios
 
-1. Click "Talk to SDR" to start the conversation
-2. The SDR will greet you warmly and ask what brought you here
-3. Have a natural conversation:
-   - Ask about Zerodha products: "What is Kite?"
-   - Ask about pricing: "What are your charges?"
-   - Ask about use cases: "Can I do algo trading?"
-4. The agent will naturally ask for your details during conversation
-5. When you're done, say "That's all" or "Thanks" to end the call
-6. The agent will provide a summary and save your lead information
+The database includes 5 test cases. Try these scenarios:
 
----
+#### Scenario 1: Confirmed Safe (John)
+1. Click "Connect to Fraud Alert"
+2. Agent: "May I have your name please?"
+3. You: "John"
+4. Agent: "What is your mother's maiden name?"
+5. You: "Smith"
+6. Agent reads transaction details
+7. Agent: "Did you authorize this transaction?"
+8. You: "Yes"
+9. Result: Transaction marked as `confirmed_safe`
 
-## 📁 Project Structure
+#### Scenario 2: Confirmed Fraud (Sarah)
+1. Start call
+2. You: "Sarah"
+3. Security question: "What city were you born in?"
+4. You: "Boston"
+5. Agent reads transaction details
+6. You: "No, I didn't make that transaction"
+7. Result: Card blocked, transaction marked as `confirmed_fraud`
 
-```
-zerodha-sdr-voice-agent/
-├── backend/
-│   ├── shared-data/
-│   │   ├── zerodha_company_info.json  # Company details
-│   │   └── zerodha_faq.json           # 25 FAQ entries
-│   ├── leads/                          # Generated lead files
-│   │   └── lead_TIMESTAMP.json        # Individual leads
-│   ├── src/
-│   │   ├── agent.py                   # Main SDR agent
-│   │   └── __init__.py
-│   ├── .env.example
-│   ├── pyproject.toml
-│   └── README.md
-├── frontend/
-│   ├── app/
-│   ├── components/
-│   ├── styles/
-│   ├── .env.example
-│   ├── package.json
-│   └── README.md
-├── DEMO_SCRIPT.md                      # Video recording guide
-├── TESTING_GUIDE.md                    # Testing scenarios
-├── .gitignore
-└── README.md
-```
+#### Scenario 3: Verification Failed (Michael)
+1. Start call
+2. You: "Michael"
+3. Security question: "What was your first pet's name?"
+4. You: "Wrong answer"
+5. Result: Call ends, marked as `verification_failed`
 
----
+### Available Test Users
 
-## 🎯 Agent Tools
+| Username | Security Question | Answer | Card Ending |
+|----------|------------------|---------|-------------|
+| John | Mother's maiden name? | Smith | 4242 |
+| Sarah | City you were born in? | Boston | 8765 |
+| Michael | First pet's name? | Buddy | 1357 |
+| Emily | Favorite color? | Blue | 9876 |
+| David | Street you grew up on? | Oak Street | 5432 |
 
-The SDR agent has 3 function tools:
+## Agent Tools
 
-### 1. search_faq(query)
-Searches the FAQ database using keyword matching to find relevant answers.
+The fraud detection agent has 4 function tools:
 
-**Example usage:**
-- User: "What does Zerodha do?"
-- Agent calls: `search_faq("what does zerodha do")`
-- Returns: Relevant FAQ answer
+### 1. load_fraud_case(username)
+Loads a fraud case from the database using the customer's name.
 
-### 2. save_lead_field(field_name, field_value)
-Stores lead information as it's collected during conversation.
+**Example:**
+- User: "My name is John"
+- Agent calls: `load_fraud_case("John")`
+- Returns: Case loaded with transaction details
 
-**Supported fields:**
-- name, company, email, role
-- use_case, team_size, timeline
+### 2. verify_customer(answer)
+Verifies customer identity using their security question answer.
 
-**Example usage:**
-- User: "My name is Rahul"
-- Agent calls: `save_lead_field("name", "Rahul")`
+**Example:**
+- Agent asks: "What is your mother's maiden name?"
+- User: "Smith"
+- Agent calls: `verify_customer("Smith")`
+- Returns: Verification passed/failed
 
-### 3. end_call_summary()
-Generates verbal summary and saves lead to JSON file.
+### 3. mark_transaction(status)
+Marks the transaction as safe or fraudulent.
 
-**Triggered when user says:**
-- "That's all", "Thanks", "Goodbye", "I'm done"
+**Parameters:**
+- `"safe"` - Customer confirmed they made the transaction
+- `"fraudulent"` - Customer denied making the transaction
 
-**Output:**
-- Verbal summary of the conversation
-- JSON file in `backend/leads/` directory
+**Example:**
+- User: "No, I didn't make that purchase"
+- Agent calls: `mark_transaction("fraudulent")`
+- Updates database and blocks card
 
----
+### 4. end_fraud_call()
+Ends the call professionally with appropriate closing message.
 
-## 📊 Lead Data Format
+## Fraud Case Data Format
 
 ```json
 {
-  "timestamp": "2025-11-26T10:30:00",
-  "lead_info": {
-    "name": "Rahul Sharma",
-    "company": "TechCorp",
-    "email": "rahul@techcorp.com",
-    "role": "Algo Trader",
-    "use_case": "Algorithmic trading using Kite Connect API",
-    "team_size": "5-10 people",
-    "timeline": "now"
-  },
-  "status": "complete"
+  "userName": "John",
+  "securityIdentifier": "12345",
+  "securityQuestion": "What is your mother's maiden name?",
+  "securityAnswer": "Smith",
+  "cardEnding": "4242",
+  "case": "confirmed_safe",
+  "transactionAmount": "$1,247.99",
+  "transactionName": "ABC Industry",
+  "transactionTime": "November 26, 2025 at 11:45 PM",
+  "transactionCategory": "e-commerce",
+  "transactionSource": "alibaba.com",
+  "transactionLocation": "Shanghai, China",
+  "verification_status": "verified",
+  "outcome_note": "Customer John confirmed the transaction as legitimate on 2025-11-27 10:30:00"
 }
 ```
 
----
+## Technical Implementation
 
-## 🏢 About Zerodha
+### Fraud Detection Flow
+1. **Name Collection** → Load case from database
+2. **Security Verification** → Ask security question
+3. **Transaction Disclosure** → Read all details clearly
+4. **Confirmation** → Get yes/no answer
+5. **Action** → Update database and take appropriate action
 
-**Company**: Zerodha  
-**Founded**: 2010  
-**Headquarters**: Bangalore, India  
-**Founders**: Nithin Kamath, Nikhil Kamath
+### Database Operations
+- **Load**: Read fraud_cases.json on startup
+- **Query**: Find case by username (case-insensitive)
+- **Update**: Modify case status and outcome
+- **Save**: Write updated database back to JSON file
 
-**Products**:
-- **Kite**: Trading platform (web, mobile, desktop)
-- **Coin**: Direct mutual fund investment platform
-- **Console**: Back-office and reports
-- **Kite Connect**: Trading APIs for developers
-- **Varsity**: Free educational content
+### Security Features
+- Never asks for full card numbers or PINs
+- Uses non-sensitive security questions
+- Verification required before disclosure
+- Clear audit trail in database
 
-**Pricing Highlights**:
-- Zero brokerage on equity delivery
-- Flat ₹20 per order for intraday/F&O
-- Zero commission on mutual funds
-- ₹2000/month for Kite Connect API
+## Testing
 
----
+Test all three scenarios:
 
-## 🔧 Technical Implementation
+1. **Confirmed Safe**: Customer authorizes transaction
+2. **Confirmed Fraud**: Customer denies transaction
+3. **Verification Failed**: Wrong security answer
 
-### FAQ Search Algorithm
-Simple but effective keyword-based search:
-1. Matches keywords in FAQ entries
-2. Scores based on question and answer relevance
-3. Returns top 2 most relevant FAQs
-4. Combines answers for comprehensive response
+Check the database file after each test to verify updates.
 
-### Lead State Management
-Uses dataclass to track lead information:
-- Stores in agent context during conversation
-- Validates completeness before saving
-- Generates timestamp-based filenames
-- Saves to JSON with proper formatting
+## Documentation & Resources
 
-### Conversation Flow
-1. **Greeting** → Warm introduction
-2. **Discovery** → Understand needs
-3. **FAQ Answering** → Use search_faq tool
-4. **Lead Collection** → Use save_lead_field tool
-5. **Summary** → Use end_call_summary tool
-
----
-
-## 📝 Testing
-
-See `TESTING_GUIDE.md` for detailed testing scenarios and verification checklist.
-
----
-
-## 🎬 Demo Recording
-
-See `DEMO_SCRIPT.md` for a complete guide on recording your demo video.
-
----
-
-## 📝 License
-
-MIT License - See LICENSE file for details
-
----
-
-## 🙏 Acknowledgments
-
-- Built for the **Murf AI Voice Agents Challenge - Day 5**
-- Powered by **Murf Falcon TTS** - The fastest text-to-speech API
-- Based on [LiveKit Agents](https://docs.livekit.io/agents)
-- Company data: Zerodha (India's largest stock broker)
-
----
-
-## 🔗 Links
-
-- **GitHub Repository**: https://github.com/Gangadhar-NG-CODER/zerodha-sdr-voice-agent
-- [Murf Falcon Documentation](https://murf.ai/api/docs/text-to-speech/streaming)
+- [Murf Falcon TTS Documentation](https://murf.ai/api/docs/text-to-speech/streaming)
 - [LiveKit Agents Documentation](https://docs.livekit.io/agents)
 - [AssemblyAI Documentation](https://www.assemblyai.com/docs)
+- [Backend Documentation](backend/README.md)
+- [Frontend Documentation](frontend/README.md)
+
+## Contributing & Community
+
+This is a challenge repository, but we encourage collaboration and knowledge sharing!
+
+- Share your solutions and learnings on GitHub
+- Post about your progress on LinkedIn
+- Join the LiveKit Community Slack
+- Connect with other challenge participants
+
+## License
+
+This project is based on MIT-licensed templates from LiveKit and includes integration with Murf Falcon. See individual LICENSE files in backend and frontend directories for details.
 
 ---
 
-## 📱 Social Media
+**Built for the AI Voice Agents Challenge by murf.ai**
 
 Part of the **#MurfAIVoiceAgentsChallenge** • **#10DaysofAIVoiceAgents**
-
----
-
-**Built with ❤️ by Gangadhar for the Murf AI Voice Agents Challenge**

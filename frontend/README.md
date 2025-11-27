@@ -1,228 +1,119 @@
-# Frontend - Zerodha SDR Voice Agent
+# Agent Starter for React
 
-Next.js 15 + React 19 frontend for the Zerodha SDR voice agent with modern UI and smooth animations.
+🎙️ **This is part of the AI Voice Agents Challenge by murf.ai**
 
-**Part of**: [zerodha-sdr-voice-agent](https://github.com/Gangadhar-NG-CODER/zerodha-sdr-voice-agent)
+This frontend is designed to work with the Murf Falcon-powered backend for ultra-fast voice interactions. See the main README for complete setup instructions and challenge details.
 
----
+This is a starter template for LiveKit Agents that provides a voice interface for the ICICI Bank Fraud Alert Agent using the LiveKit JavaScript SDK. It supports voice interaction, real-time transcriptions, and a professional banking UI.
 
-## Quick Start
+Based on: [livekit-examples/agent-starter-react](https://github.com/livekit-examples/agent-starter-react)
 
-```bash
-# Install dependencies
-pnpm install
-
-# Configure environment
-cp .env.example .env.local
-# Edit .env.local with LiveKit credentials
-
-# Run development server
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## Environment Variables
-
-Required in `.env.local`:
-
-```bash
-LIVEKIT_API_KEY=devkey
-LIVEKIT_API_SECRET=secret
-LIVEKIT_URL=ws://127.0.0.1:7880
-```
-
----
+Also available for: Android • Flutter • Swift • React Native
 
 ## Features
 
-### UI Design
+- Real-time voice interaction with LiveKit Agents
+- Audio visualization and level monitoring
+- Light/dark theme switching with system preference detection
+- Customizable branding, colors, and UI text via configuration
+- ICICI Bank branded UI with security-focused design
+- Fraud alert badge and trust indicators
+- Enhanced animations and visual effects
+- Responsive design for desktop and mobile
 
-- **Blue/Cyan Theme**: Professional business-oriented color scheme
-- **Animated Elements**: 
-  - Rotating rings around icon
-  - Bouncing briefcase icon
-  - Pinging background particles
-  - Glowing button effects
-  - Interactive title words
-- **Responsive**: Works on desktop and mobile
-- **Smooth Transitions**: All interactions have smooth animations
+This template is built with Next.js and is free for you to use or modify as you see fit.
 
-### Components
-
-- **Welcome View**: Landing page with "Talk to SDR" button
-- **Session View**: Active conversation interface
-- **Voice Controls**: Mute, volume, chat toggle
-- **End Call**: Clean disconnect with summary
-
----
-
-## Project Structure
+## Project structure
 
 ```
-frontend/
+agent-starter-react/
 ├── app/
 │   ├── (app)/
-│   │   └── page.tsx              # Main page
 │   ├── api/
-│   │   └── connection-details/   # LiveKit connection API
-│   ├── layout.tsx                # Root layout
-│   └── ui/                       # UI components
+│   ├── components/
+│   ├── fonts/
+│   ├── globals.css
+│   └── layout.tsx
 ├── components/
-│   ├── app/
-│   │   ├── app.tsx              # Main app component
-│   │   ├── welcome-view.tsx     # Landing page
-│   │   ├── session-view.tsx     # Conversation UI
-│   │   └── session-provider.tsx # State management
-│   └── livekit/                 # LiveKit UI components
-├── styles/
-│   └── globals.css              # Global styles
-├── app-config.ts                # App configuration
-├── package.json
-└── README.md
+│   ├── livekit/
+│   ├── ui/
+│   ├── app.tsx
+│   ├── session-view.tsx
+│   └── welcome.tsx
+├── hooks/
+├── lib/
+├── public/
+└── package.json
 ```
 
----
+## Getting started
 
-## UI Customization
+> **Tip**  
+> If you'd like to try this application without modification, you can deploy an instance in just a few clicks with LiveKit Cloud Sandbox.
 
-### Colors
-
-The app uses a blue/cyan/teal gradient theme. To customize:
-
-**File**: `app-config.ts`
-```typescript
-accent: '#06b6d4',      // Cyan
-accentDark: '#22d3ee',  // Light cyan
-```
-
-**File**: `components/app/welcome-view.tsx`
-```typescript
-// Gradient colors
-from-blue-500 via-cyan-500 to-teal-500
-```
-
-### Animations
-
-**Rotating Rings**: Around the icon
-```typescript
-animationDuration: '8s'  // Adjust speed
-```
-
-**Bouncing Icon**: Briefcase animation
-```typescript
-animationDuration: '3s'  // Adjust bounce speed
-```
-
-**Button Hover**: Scale and glow effects
-```typescript
-hover:scale-110          // Adjust scale
-hover:shadow-cyan-500/50 // Adjust glow color
-```
-
----
-
-## Tech Stack
-
-- **Framework**: Next.js 15.5.2 (Turbopack)
-- **React**: 19.2.0
-- **LiveKit**: Components React 2.9.16
-- **Styling**: Tailwind CSS 4.1.17
-- **Animations**: Motion 12.23.24
-- **UI Components**: Radix UI
-- **TypeScript**: 5.9.3
-
----
-
-## Development
+Run the following command to automatically clone this template:
 
 ```bash
-# Install dependencies
+lk app create --template agent-starter-react
+```
+
+Then run the app with:
+
+```bash
 pnpm install
-
-# Run development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Start production server
-pnpm start
-
-# Lint code
-pnpm lint
-```
-
----
-
-## API Routes
-
-### POST /api/connection-details
-
-Generates LiveKit connection details for the voice session.
-
-**Request Body:**
-```json
-{
-  "room_config": {
-    "agents": [
-      {
-        "agent_name": ""
-      }
-    ]
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "serverUrl": "ws://127.0.0.1:7880",
-  "roomName": "voice_assistant_room_1234",
-  "participantToken": "eyJhbGc...",
-  "participantName": "user"
-}
-```
-
----
-
-## Troubleshooting
-
-### Port Already in Use
-
-If port 3000 is in use:
-```bash
-# The app will automatically use port 3001
-# Or specify a different port:
-PORT=3001 pnpm dev
-```
-
-### Environment Variables Not Loading
-
-1. Ensure `.env.local` exists
-2. Restart the development server
-3. Clear `.next` cache:
-```bash
-rm -rf .next
 pnpm dev
 ```
 
-### Connection Issues
+And open http://localhost:3000 in your browser.
 
-1. Verify LiveKit server is running on port 7880
-2. Check backend agent is connected
-3. Verify environment variables match across all services
+You'll also need an agent to speak with. Try our starter agent for Python, Node.js, or create your own from scratch.
 
----
+## Configuration
 
-## Documentation
+This starter is designed to be flexible so you can adapt it to your specific agent use case. You can easily configure it to work with different types of inputs and outputs:
 
-See the [main README](../README.md) for complete setup instructions.
+### Example: App configuration (app-config.ts)
 
----
+```typescript
+export const APP_CONFIG_DEFAULTS: AppConfig = {
+  companyName: 'ICICI Bank',
+  pageTitle: 'ICICI Bank Fraud Alert - AI Fraud Detection',
+  pageDescription: 'Verify suspicious transactions with our AI fraud detection agent',
+  
+  supportsChatInput: true,
+  supportsVideoInput: false,
+  supportsScreenShare: false,
+  isPreConnectBufferEnabled: true,
+  
+  logo: '/lk-logo.svg',
+  accent: '#f97316',
+  logoDark: '/lk-logo-dark.svg',
+  accentDark: '#3b82f6',
+  startButtonText: 'Connect to Fraud Alert',
+  
+  // for LiveKit Cloud Sandbox
+  sandboxId: undefined,
+  agentName: undefined,
+};
+```
 
-**Part of the Murf AI Voice Agents Challenge - Day 5**
+You can update these values in `app-config.ts` to customize branding, features, and UI text for your deployment.
 
-**GitHub**: https://github.com/Gangadhar-NG-CODER/zerodha-sdr-voice-agent
+> **Note**  
+> The `sandboxId` and `agentName` are for the LiveKit Cloud Sandbox environment. They are not used for local development.
+
+## Environment Variables
+
+You'll also need to configure your LiveKit credentials in `.env.local` (copy `.env.example` if you don't have one):
+
+```env
+LIVEKIT_API_KEY=your_livekit_api_key
+LIVEKIT_API_SECRET=your_livekit_api_secret
+LIVEKIT_URL=https://your-livekit-server-url
+```
+
+These are required for the voice agent functionality to work with your LiveKit project.
+
+## Contributing
+
+This template is open source and we welcome contributions! Please open a PR or issue through GitHub, and don't forget to join us in the LiveKit Community Slack!

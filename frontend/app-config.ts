@@ -20,9 +20,9 @@ export interface AppConfig {
 }
 
 export const APP_CONFIG_DEFAULTS: AppConfig = {
-  companyName: 'Zerodha',
-  pageTitle: 'Zerodha SDR Agent - AI Sales Representative',
-  pageDescription: 'Talk to our AI SDR to learn about Zerodha products, pricing, and services',
+  companyName: 'ICICI Bank',
+  pageTitle: 'ICICI Bank Fraud Alert - AI Fraud Detection',
+  pageDescription: 'Verify suspicious transactions with our AI fraud detection agent',
 
   supportsChatInput: true,
   supportsVideoInput: false,
@@ -30,10 +30,10 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
   isPreConnectBufferEnabled: true,
 
   logo: '/lk-logo.svg',
-  accent: '#06b6d4',
+  accent: '#f97316',
   logoDark: '/lk-logo-dark.svg',
-  accentDark: '#22d3ee',
-  startButtonText: 'Talk to SDR',
+  accentDark: '#3b82f6',
+  startButtonText: 'Connect to Fraud Alert',
 
   // for LiveKit Cloud Sandbox
   sandboxId: undefined,

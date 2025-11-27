@@ -99,6 +99,8 @@ pnpm-lock.yaml
 *.mp3
 *.mp4
 recordings/
+livekit-server.exe
+livekit-server
 
 # ===================================
 # User Data / Leads
