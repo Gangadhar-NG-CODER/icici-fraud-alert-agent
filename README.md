@@ -1,8 +1,15 @@
-# ICICI Bank Fraud Alert Voice Agent
+# 🔒 ICICI Bank Fraud Alert Voice Agent
 
-🎙️ **AI Voice Agents Challenge by murf.ai - Day 6**
+![CHALLENGE](https://img.shields.io/badge/CHALLENGE-10%20DAYS%20OF%20AI%20VOICE%20AGENTS-blue?style=for-the-badge)
+![TTS](https://img.shields.io/badge/TTS-MURF%20FALCON-orange?style=for-the-badge)
+![FRAMEWORK](https://img.shields.io/badge/FRAMEWORK-LIVEKIT-green?style=for-the-badge)
+![PYTHON](https://img.shields.io/badge/PYTHON-3.9+-yellow?style=for-the-badge&logo=python)
+![NEXT.JS](https://img.shields.io/badge/NEXT.JS-15-black?style=for-the-badge&logo=next.js)
+![DAY](https://img.shields.io/badge/DAY-6-blueviolet?style=for-the-badge)
 
-Welcome to the ICICI Bank Fraud Alert Voice Agent! This project is part of the AI Voice Agents Challenge, where we build 10 AI Voice Agents over 10 days using **Murf Falcon** – the consistently fastest TTS API.
+**Building 10 AI Voice Agents in 10 Days** using Murf Falcon TTS - the consistently fastest text-to-speech API in the world.
+
+---
 
 ## About the Challenge
 
